@@ -5,6 +5,13 @@
 venv/
 .env
 
+# Windows thumbnail dir
+Thumbs.db
+
+#Large output files
+build/output/*
+
+
 # Кеші та байткод
 __pycache__/
 *.pyc
