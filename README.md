@@ -21,7 +21,7 @@ Lab1_IT/
       └── .gitignore         # список файлів для ігнорування
 
 
-## 🚀 Запуск програми
+##  Запуск програми
 1. Клонуйте репозиторій:
    ```bash
    git clone https://github.com/MaxAsto/Lab1_IT.git
