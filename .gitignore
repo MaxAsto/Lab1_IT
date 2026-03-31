@@ -1,22 +1,26 @@
-# Логи
+# Logs
 *.log
 
-# Віртуальне середовище
+# Virtual environment
 venv/
 .env
 
 # Windows thumbnail dir
 Thumbs.db
 
-#Large output files
-build/output/*
+# Build / output
+build/
+dist/
+*.egg-info/
 
-
-# Кеші та байткод
+# Caches and bytecode
 __pycache__/
 *.pyc
 *.pyo
 
-# IDE файли
+# IDE files
 .vscode/
 .idea/
+
+# Optional: ignore demo_data.json if it's temporary
+# demo_data.json
