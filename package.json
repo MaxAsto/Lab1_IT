@@ -1,0 +1,26 @@
+{
+  "name": "lab1-it",
+  "version": "1.0.0",
+  "description": "Лабораторна робота №1-2 з Git.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MaxAsto/Lab1_IT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MaxAsto/Lab1_IT/issues"
+  },
+  "homepage": "https://github.com/MaxAsto/Lab1_IT#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.0",
+    "@types/node": "^25.5.0"
+  }
+}

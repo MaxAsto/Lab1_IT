@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDo App</title>
+</head>
+<body>
+  <h1>Мій список задач</h1>
+  <input id="task-input" type="text" placeholder="Введіть задачу">
+  <button id="add-button">Додати</button>
+  <ul id="task-list"></ul>
+
+  <script>
+    const input = document.getElementById('task-input');
+    const button = document.getElementById('add-button');
+    const list = document.getElementById('task-list');
+
+    button.addEventListener('click', () => {
+      const text = input.value.trim();
+      if (text) {
+        const li = document.createElement('li');
+        li.textContent = text;
+        list.appendChild(li);
+        input.value = '';
+      }
+    });
+  </script>
+</body>
+</html>

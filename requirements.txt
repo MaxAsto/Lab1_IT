@@ -6,7 +6,7 @@ pytest-mock
 # Для роботи з JSON та HTTP-запитами
 requests
 
-# Для роботи з даними (якщо потрібно)
+# Для роботи з даними 
 numpy
 pandas
 

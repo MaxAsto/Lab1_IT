@@ -6,7 +6,7 @@ from Lab1_IT import (
     greet, add, subtract, multiply, divide,
     is_palindrome, factorial,
     save_to_file, load_from_file,
-    TodoList
+    TodoList, pause, main
 )
 
 def test_greet_valid_name():
@@ -84,27 +84,71 @@ def test_todo_list_tasks():
     tasks = todo.list_tasks()
     assert len(tasks) == 2
 
-def test_load_from_file_with_mock(mocker):
-    fake_data = '{"key": "value"}'
-    m_open = mock_open(read_data=fake_data)
-    mocker.patch("builtins.open", m_open)
-    result = load_from_file("fake.json")
-    assert result == {"key": "value"}
+
 
 def test_load_from_file_not_exists(tmp_path):
     file_path = tmp_path / "nofile.json"
     result = load_from_file(str(file_path))
     assert result == {}
 
-
-    
-
 def test_load_from_file_with_mock(mocker):
     fake_data = '{"key": "value"}'
     m_open = mock_open(read_data=fake_data)
     mocker.patch("builtins.open", m_open)
-    mocker.patch("os.path.exists", return_value=True)  # <-- додано
+    mocker.patch("os.path.exists", return_value=True)  
 
     result = load_from_file("fake.json")
     assert result == {"key": "value"}
 
+
+def test_pause(monkeypatch):
+    # емулюємо натискання клавіші
+    monkeypatch.setattr("builtins.input", lambda _: " ")
+    pause()  # просто перевіряємо, що викликається без помилок
+
+def test_main_greeting(monkeypatch, capsys):
+    inputs = iter(["1", "Maks", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert "Hello, Maks!" in captured.out
+
+def test_main_math(monkeypatch, capsys):
+    inputs = iter(["2", "10", "5", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert "10.0 + 5.0 = 15.0" in captured.out
+
+def test_main_palindrome(monkeypatch, capsys):
+    inputs = iter(["3", "level", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert "Palindrome? True" in captured.out
+
+def test_main_factorial(monkeypatch, capsys):
+    inputs = iter(["4", "5", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert "Factorial of 5 = 120" in captured.out
+
+def test_main_todo(monkeypatch, capsys):
+    inputs = iter(["5", "a", "Test task", " ", "5", "d", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    main()
+    captured = capsys.readouterr()
+    assert "Test task" in captured.out
+    assert "Tasks:" in captured.out
+
+def test_main_save_load(monkeypatch, capsys, tmp_path):
+    filename = tmp_path / "demo_data.json"
+    inputs = iter(["6", "a", " ", "6", "b", " ", "0"])
+    monkeypatch.setattr("builtins.input", lambda _: next(inputs))
+    monkeypatch.setattr("Lab1_IT.save_to_file", lambda f, d: filename.write_text("{}", encoding="utf-8"))
+    monkeypatch.setattr("Lab1_IT.load_from_file", lambda f: {"user": None, "tasks": []})
+    main()
+    captured = capsys.readouterr()
+    assert "Data saved." in captured.out
+    assert "Loaded data:" in captured.out
