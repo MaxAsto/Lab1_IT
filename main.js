@@ -4,15 +4,9 @@ function greet(name) {
   return `Hello, ${name.trim()[0].toUpperCase() + name.trim().slice(1)}!`;
 }
 
-function add(a, b) {
-  return a + b;
-}
-function subtract(a, b) {
-  return a - b;
-}
-function multiply(a, b) {
-  return a * b;
-}
+function add(a, b) { return a + b; }
+function subtract(a, b) { return a - b; }
+function multiply(a, b) { return a * b; }
 function divide(a, b) {
   if (b === 0) throw new Error("Division by zero is not allowed");
   return a / b;
@@ -32,26 +26,26 @@ function factorial(n) {
 }
 
 // ===== ToDo КЛАС =====
-class TodoList {
+class Todo {
   constructor() {
     this.tasks = [];
+    this.nextId = 1;
   }
 
-  addTask(description) {
-    if (!description.trim())
-      throw new Error("Task description cannot be empty");
+  addTask(text) {
+    if (!text || !text.trim()) throw new Error("Task description cannot be empty");
     const task = {
-      id: this.tasks.length + 1,
-      description: description.trim(),
-      created_at: new Date().toISOString(),
-      done: false,
+      id: this.nextId++,
+      text: text.trim(),
+      createdAt: new Date(),
+      done: false
     };
     this.tasks.push(task);
     return task;
   }
 
-  markDone(taskId) {
-    const task = this.tasks.find((t) => t.id === taskId);
+  markDone(id) {
+    const task = this.tasks.find(t => t.id === id);
     if (task) {
       task.done = true;
       return true;
@@ -59,13 +53,10 @@ class TodoList {
     return false;
   }
 
-  removeTask(taskId) {
-    const index = this.tasks.findIndex((t) => t.id === taskId);
-    if (index !== -1) {
-      this.tasks.splice(index, 1);
-      return true;
-    }
-    return false;
+  removeTask(id) {
+    const initialLength = this.tasks.length;
+    this.tasks = this.tasks.filter(t => t.id !== id);
+    return this.tasks.length < initialLength;
   }
 
   listTasks() {
@@ -74,16 +65,16 @@ class TodoList {
 }
 
 // ===== ЗБЕРЕЖЕННЯ / ЗАВАНТАЖЕННЯ =====
-function saveToStorage(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+function saveToStorage(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
 }
 function loadFromStorage(key) {
-  const raw = localStorage.getItem(key);
-  return raw ? JSON.parse(raw) : [];
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : [];
 }
 
 // ===== ІНТЕРФЕЙС =====
-const todo = new TodoList();
+const todo = new Todo();
 
 // Greeting
 document.getElementById("greet-button").addEventListener("click", () => {
@@ -126,23 +117,34 @@ document.getElementById("fact-button").addEventListener("click", () => {
   }
 });
 
-// ToDo
+// ===== ToDo ІНТЕРФЕЙС =====
+function renderTasks() {
+  const output = document.getElementById("output");
+  if (todo.tasks.length === 0) {
+    output.textContent = "No tasks.";
+  } else {
+    output.textContent = todo.tasks
+      .map(
+        t =>
+          `ID: ${t.id}, Text: ${t.text}, Date: ${t.createdAt.toLocaleString()}, Done: ${t.done}`
+      )
+      .join("\n");
+  }
+}
+
 document.getElementById("add-task").addEventListener("click", () => {
-  const desc = document.getElementById("task-desc").value;
-  try {
-    const task = todo.addTask(desc);
-    document.getElementById("output").textContent =
-      "Added: " + JSON.stringify(task, null, 2);
-    document.getElementById("task-desc").value = "";
-  } catch (e) {
-    alert(e.message);
+  const input = document.getElementById("task-desc");
+  if (input.value.trim() !== "") {
+    todo.addTask(input.value.trim());
+    renderTasks();
+    input.value = "";
   }
 });
 
 document.getElementById("mark-done").addEventListener("click", () => {
   const id = parseInt(document.getElementById("task-id").value);
   if (todo.markDone(id)) {
-    document.getElementById("output").textContent = "Task marked as done.";
+    renderTasks();
   } else {
     document.getElementById("output").textContent = "Task not found.";
   }
@@ -151,15 +153,14 @@ document.getElementById("mark-done").addEventListener("click", () => {
 document.getElementById("remove-task").addEventListener("click", () => {
   const id = parseInt(document.getElementById("task-id").value);
   if (todo.removeTask(id)) {
-    document.getElementById("output").textContent = "Task removed.";
+    renderTasks();
   } else {
     document.getElementById("output").textContent = "Task not found.";
   }
 });
 
 document.getElementById("list-tasks").addEventListener("click", () => {
-  document.getElementById("output").textContent =
-    "Tasks: " + JSON.stringify(todo.listTasks(), null, 2);
+  renderTasks();
 });
 
 document.getElementById("save-tasks").addEventListener("click", () => {
@@ -169,9 +170,11 @@ document.getElementById("save-tasks").addEventListener("click", () => {
 
 document.getElementById("load-tasks").addEventListener("click", () => {
   const loaded = loadFromStorage("tasks");
-  todo.tasks = loaded;
-  document.getElementById("output").textContent =
-    "Loaded: " + JSON.stringify(loaded, null, 2);
+  todo.tasks = loaded.map(t => ({
+    ...t,
+    createdAt: new Date(t.createdAt) // відновлюємо дату
+  }));
+  renderTasks();
 });
 
 // Env status
