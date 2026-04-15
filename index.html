@@ -2,28 +2,60 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <title>ToDo App</title>
+  <title>Demo Program</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Мій список задач</h1>
-  <input id="task-input" type="text" placeholder="Введіть задачу">
-  <button id="add-button">Додати</button>
-  <ul id="task-list"></ul>
+  <div class="container">
+    <h1>Інтерактивна програма</h1>
 
-  <script>
-    const input = document.getElementById('task-input');
-    const button = document.getElementById('add-button');
-    const list = document.getElementById('task-list');
+    <section>
+      <h2>Привітання</h2>
+      <input id="name-input" type="text" placeholder="Введіть ім'я">
+      <button id="greet-button">Привітати</button>
+      <p id="greet-result"></p>
+    </section>
 
-    button.addEventListener('click', () => {
-      const text = input.value.trim();
-      if (text) {
-        const li = document.createElement('li');
-        li.textContent = text;
-        list.appendChild(li);
-        input.value = '';
-      }
-    });
-  </script>
+    <section>
+      <h2>Математичні операції</h2>
+      <input id="num-a" type="number" placeholder="Перше число">
+      <input id="num-b" type="number" placeholder="Друге число">
+      <button id="math-button">Обчислити</button>
+      <pre id="math-result"></pre>
+    </section>
+
+    <section>
+      <h2>Перевірка паліндрома</h2>
+      <input id="pal-input" type="text" placeholder="Введіть текст">
+      <button id="pal-button">Перевірити</button>
+      <p id="pal-result"></p>
+    </section>
+
+    <section>
+      <h2>Факторіал</h2>
+      <input id="fact-input" type="number" placeholder="Введіть число">
+      <button id="fact-button">Обчислити</button>
+      <p id="fact-result"></p>
+    </section>
+
+    <section>
+      <h2>ToDo список</h2>
+      <input id="task-desc" type="text" placeholder="Опис завдання">
+      <button id="add-task">Додати</button>
+      <br><br>
+      <input id="task-id" type="number" placeholder="ID завдання">
+      <button id="mark-done">Позначити виконаним</button>
+      <button id="remove-task">Видалити</button>
+      <button id="list-tasks">Показати всі</button>
+      <br><br>
+      <button id="save-tasks">Зберегти</button>
+      <button id="load-tasks">Завантажити</button>
+      <pre id="output"></pre>
+    </section>
+
+    <footer id="status"></footer>
+  </div>
+
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

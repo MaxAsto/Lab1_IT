@@ -1,0 +1,56 @@
+/* Голубий фон */
+body {
+  background-color: #e6f2ff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Контейнер по центру */
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Заголовки */
+h1 {
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #004080;
+}
+
+h2 {
+  font-family: 'Verdana', sans-serif;
+  color: #0066cc;
+  margin-top: 20px;
+}
+
+/* Звичайний текст */
+p, pre, input, button {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+}
+
+/* Кнопки */
+button {
+  background-color: #3399ff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #1a8cff;
+}
+
+/* Поля вводу */
+input {
+  padding: 6px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
