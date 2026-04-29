@@ -179,3 +179,7 @@ document.getElementById("load-tasks").addEventListener("click", () => {
 
 // Env status
 document.getElementById("status").textContent = import.meta.env.VITE_APP_STATUS;
+const statusElement = document.getElementById("status");
+statusElement.innerHTML = "Production Mode<br>Quality Gate active";
+
+
