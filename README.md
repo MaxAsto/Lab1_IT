@@ -1,6 +1,12 @@
-# Lab1_IT
+# Lab1-4_IT
 
-Лабораторна робота №1-2 з Git.
+# Demo Program
+[![CI/CD Pipeline](https://github.com/MaxAsto/Lab1_IT/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/MaxAsto/Lab1_IT/actions/workflows/ci-cd.yml)
+
+## Production URL
+[Відкрити живу версію](https://lab-it-iota.vercel.app/)
+
+Лабораторна робота №1-4 з Git.
 
 ##  Опис
 Цей проєкт — інтерактивна консольна програма на Python, яка демонструє:
