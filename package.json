@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --port 3000",
     "start": "vite preview --port 3000",
-    "lint": "eslint *.js --fix",
+    "lint": "eslint . --ext .js,.vue --fix",
     "format": "prettier --write \"**/*.{js,vue,json,css}\""
   },
   "repository": {
