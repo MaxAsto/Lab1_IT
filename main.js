@@ -1,3 +1,20 @@
+
+import posthog from 'posthog-js'
+import { createApp } from 'vue'
+
+// Ініціалізація PostHog
+posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
+  api_host: '/ingest',
+  person_profiles: 'identified_only',
+})
+
+const app = createApp({
+  template: `<div id="app"><h1>Hello Vue + PostHog!</h1></div>`
+})
+
+app.mount('#app')
+
+
 // ===== ФУНКЦІЇ =====
 function greet(name) {
   if (!name || !name.trim()) return "Hello, Stranger!";

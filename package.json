@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/MaxAsto/Lab1_IT#readme",
   "dependencies": {
+    "posthog-js": "^1.373.2",
     "vue": "^3.4.21"
   },
   "devDependencies": {
