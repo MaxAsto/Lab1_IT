@@ -4,7 +4,7 @@ import { createApp } from 'vue'
 
 // Ініціалізація PostHog
 posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
-  api_host: '/ingest',
+  api_host: import.meta.env.VITE_POSTHOG_HOST,
   person_profiles: 'identified_only',
 })
 
@@ -13,6 +13,19 @@ const app = createApp({
 })
 
 app.mount('#app')
+
+// ===== Feature Flag: Urgent Filter =====
+posthog.onFeatureFlags(() => {
+  if (posthog.isFeatureEnabled('show-urgent-filter')) {
+    // Якщо прапорець увімкнений → показуємо кнопку
+    const urgentBtn = document.getElementById('urgent-btn');
+    if (urgentBtn) urgentBtn.style.display = 'block';
+  } else {
+    // Якщо прапорець вимкнений → ховаємо кнопку
+    const urgentBtn = document.getElementById('urgent-btn');
+    if (urgentBtn) urgentBtn.style.display = 'none';
+  }
+});
 
 
 // ===== ФУНКЦІЇ =====
@@ -58,23 +71,47 @@ class Todo {
       done: false
     };
     this.tasks.push(task);
+
+    // Подія у PostHog
+  posthog.capture('task_created', {
+    priority: 'high',
+    category: 'work',
+    is_authenticated: true,
+  });
+
     return task;
   }
 
   markDone(id) {
-    const task = this.tasks.find(t => t.id === id);
-    if (task) {
-      task.done = true;
-      return true;
-    }
-    return false;
+  const task = this.tasks.find(t => t.id === id);
+  if (task) {
+    task.done = true;
+
+    // Подія у PostHog
+    posthog.capture('task_completed', {
+      time_to_complete_seconds: Math.floor((Date.now() - task.createdAt.getTime()) / 1000),
+    });
+
+    return true;
   }
+  return false;
+}
+
 
   removeTask(id) {
-    const initialLength = this.tasks.length;
-    this.tasks = this.tasks.filter(t => t.id !== id);
-    return this.tasks.length < initialLength;
+  const initialLength = this.tasks.length;
+  this.tasks = this.tasks.filter(t => t.id !== id);
+
+  if (this.tasks.length < initialLength) {
+    // Подія у PostHog
+    posthog.capture('task_deleted', {
+      reason: 'mistake', 
+    });
+    return true;
   }
+  return false;
+}
+
 
   listTasks() {
     return this.tasks;

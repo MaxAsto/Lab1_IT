@@ -46,7 +46,13 @@
       <input id="task-id" type="number" placeholder="ID завдання">
       <button id="mark-done">Позначити виконаним</button>
       <button id="remove-task">Видалити</button>
-      <button id="list-tasks">Показати всі</button>
+
+      <!-- Контейнер для кнопок у рядку -->
+      <div class="todo-row">
+        <button id="list-tasks">Показати всі</button>
+        <button id="urgent-btn" style="display:none;">Only Urgent</button>
+      </div>
+
       <br><br>
       <button id="save-tasks">Зберегти</button>
       <button id="load-tasks">Завантажити</button>

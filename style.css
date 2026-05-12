@@ -54,3 +54,10 @@ input {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+/* Контейнер для кнопок у рядку */
+.todo-row {
+  display: flex;       /* ставить кнопки в ряд */
+  justify-content: center; /* вирівнює по центру */
+  gap: 10px;           /* відстань між кнопками */
+}
