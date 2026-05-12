@@ -33,11 +33,8 @@ export default [
     },
     
   },
-  
-  module.exports = {
-  env: {
-    node: true,
-  },
-}
+
+ 
+
 ];
 
