@@ -1,3 +1,5 @@
+import { URL } from 'url'
+
 export default async function middleware(request) {
   const url = new URL(request.url)
 

@@ -31,5 +31,13 @@ export default [
       "no-unused-vars": "error",
       "no-empty": "error",
     },
+    
   },
+  
+  module.exports = {
+  env: {
+    node: true,
+  },
+}
 ];
+
