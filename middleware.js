@@ -1,9 +1,8 @@
-import { URL } from 'url'
-
 export default async function middleware(request) {
+  // Використовуємо глобальний Web API URL (без імпорту)
   const url = new URL(request.url)
 
-  
+  // Якщо шлях не починається з /ingest → нічого не робимо
   if (!url.pathname.startsWith('/ingest')) {
     return
   }
@@ -14,7 +13,7 @@ export default async function middleware(request) {
   // Цільовий домен PostHog
   const targetUrl = new URL(posthogPath, 'https://eu.posthog.com')
 
-  // Пересилаємо запит
+  // Пересилаємо запит далі
   return fetch(targetUrl, {
     method: request.method,
     headers: request.headers,
