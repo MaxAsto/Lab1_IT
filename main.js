@@ -1,7 +1,8 @@
 
 import posthog from 'posthog-js'
 import { createApp } from 'vue'
-import router from "./router";
+import * as Sentry from "@sentry/vue";
+
 
 // Ініціалізація PostHog
 posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
@@ -22,10 +23,12 @@ Sentry.init({
     Sentry.replayIntegration(),
   ],
   tracesSampleRate: 1.0,        
-  environment: "development",   
+  environment: "production",   
 })
-
 app.mount('#app')
+
+myUndefinedFunction();
+
 
 // ===== Feature Flag: Urgent Filter =====
 posthog.onFeatureFlags(() => {
