@@ -31,15 +31,15 @@ function login() {
 }
 
 
-login();
-
 // При виході користувача очищаємо контекст
 function logout() {
   Sentry.setUser(null);
   console.log("User context cleared in Sentry");
 }
 
-logout();
+  // Прив’язуємо кнопки до функцій
+document.getElementById("login-btn").addEventListener("click", login);
+document.getElementById("logout-btn").addEventListener("click", logout);
 
 
 // Feature Flag: Urgent Filter
