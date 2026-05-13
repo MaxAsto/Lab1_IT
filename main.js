@@ -1,41 +1,50 @@
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
 
-
-// POSTHOG
-posthog.init(
-  "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
-  {
-    api_host: import.meta.env.VITE_POSTHOG_HOST,
-    person_profiles: "identified_only",
-  }
-);
-
-// SENTRY INIT
-Sentry.init({
-  dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
-
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
-  ],
-
-  tracesSampleRate: 1.0,
-
-  replaysSessionSampleRate: 1.0,
-  replaysOnErrorSampleRate: 1.0,
-
-  environment: "production",
-  release: "lab-1.0.0",
-  debug: true,
-});
+// =========================
+// SAFE ENV CHECK
+// =========================
+const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
 
 
-// ===============================
-// SAFE INIT (тільки браузер)
-// ===============================
+// =========================
+// ANALYTICS INIT (browser only)
+// =========================
+if (isBrowser) {
+  posthog.init(
+    "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
+    {
+      api_host: import.meta.env.VITE_POSTHOG_HOST,
+      person_profiles: "identified_only",
+    }
+  );
+
+  Sentry.init({
+    dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
+
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration(),
+    ],
+
+    tracesSampleRate: 1.0,
+    replaysSessionSampleRate: 1.0,
+    replaysOnErrorSampleRate: 1.0,
+
+    environment: "production",
+    release: "lab-1.0.0",
+    debug: true,
+  });
+}
+
+
+// =========================
+// APP LOGIC
+// =========================
 function init() {
-  console.log("DOM fully loaded");
+  if (!isBrowser) return;
+
+  console.log("App initialized");
 
   const loginBtn = document.getElementById("login-btn");
   const logoutBtn = document.getElementById("logout-btn");
@@ -43,13 +52,9 @@ function init() {
   const breakBtn = document.getElementById("break-btn");
   const loadBtn = document.getElementById("load-btn");
 
-  console.log("loadBtn:", loadBtn);
-  console.log("loginBtn:", loginBtn);
-  console.log("logoutBtn:", logoutBtn);
-  console.log("urgentBtn:", urgentBtn);
-  console.log("breakBtn:", breakBtn);
-
-  // LOGIN
+  // -------------------------
+  // AUTH
+  // -------------------------
   function login() {
     Sentry.setUser({
       id: "12345",
@@ -57,25 +62,28 @@ function init() {
       segment: "premium_user",
     });
 
-    console.log("User context set");
+    console.log("User logged in");
   }
 
-  // LOGOUT
   function logout() {
     Sentry.setUser(null);
-    console.log("User context cleared");
+    console.log("User logged out");
   }
 
-  // FEATURE FLAGS
+  // -------------------------
+  // FEATURE FLAGS (PostHog)
+  // -------------------------
   posthog.onFeatureFlags(() => {
-    if (posthog.isFeatureEnabled("show-urgent-filter")) {
-      if (urgentBtn) urgentBtn.style.display = "block";
-    } else {
-      if (urgentBtn) urgentBtn.style.display = "none";
+    const enabled = posthog.isFeatureEnabled("show-urgent-filter");
+
+    if (urgentBtn) {
+      urgentBtn.style.display = enabled ? "block" : "none";
     }
   });
 
+  // -------------------------
   // FAKE API
+  // -------------------------
   async function fakeApiRequest() {
     return Sentry.startSpan(
       {
@@ -83,18 +91,20 @@ function init() {
         name: "GET /tasks",
       },
       async () => {
-        console.log("Fake API request started");
+        console.log("API start");
 
-        await new Promise((resolve) => setTimeout(resolve, 3000));
+        await new Promise((r) => setTimeout(r, 3000));
 
-        console.log("Fake API request finished");
+        console.log("API done");
 
         return { tasks: [1, 2, 3] };
       }
     );
   }
 
+  // -------------------------
   // HEAVY UI
+  // -------------------------
   async function heavyUiRender() {
     return Sentry.startSpan(
       {
@@ -102,94 +112,85 @@ function init() {
         name: "Heavy Tasks Component",
       },
       async () => {
-        console.log("Heavy UI rendering started");
+        console.log("UI start");
 
-        const start = Date.now();
+        const start = performance.now();
 
-        while (Date.now() - start < 2000) {
+        while (performance.now() - start < 2000) {
           Math.sqrt(Math.random() * 100000);
         }
 
-        console.log("Heavy UI rendering finished");
+        console.log("UI done");
       }
     );
   }
 
-  // LOAD BUTTON
+  // -------------------------
+  // LOAD FLOW
+  // -------------------------
   if (loadBtn) {
     loadBtn.addEventListener("click", async () => {
-      console.log("Load button clicked");
-
       await Sentry.startSpan(
         {
           op: "navigation",
           name: "Load Tasks Page",
         },
         async () => {
-          console.log("Transaction started");
-
           await fakeApiRequest();
           await heavyUiRender();
-
-          console.log("Transaction finished");
         }
       );
     });
   }
 
-  // LOGIN
-  if (loginBtn) loginBtn.addEventListener("click", login);
+  // -------------------------
+  // AUTH EVENTS
+  // -------------------------
+  loginBtn?.addEventListener("click", login);
+  logoutBtn?.addEventListener("click", logout);
 
-  // LOGOUT
-  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+  // -------------------------
+  // ERROR TEST BUTTON
+  // -------------------------
+  breakBtn?.addEventListener("click", () => {
+    const urgentTasksCount = 5;
+    const randomValue = Math.random();
 
-  // BREAK BUTTON (помилка для Sentry)
-  if (breakBtn) {
-    breakBtn.addEventListener("click", () => {
-      const urgentTasksCount = 5;
-      const randomValue = Math.random();
+    const error = new Error(
+      `Critical failure: ${
+        urgentTasksCount > 2
+          ? `too many tasks (${urgentTasksCount})`
+          : "unknown issue"
+      }`
+    );
 
-      const errorMessage =
-        `Critical failure in show-urgent-filter action: ${
-          urgentTasksCount > 2
-            ? `too many urgent tasks (${urgentTasksCount})`
-            : "unknown issue"
-        }`;
-
-      const error = new Error(errorMessage);
-
-      Sentry.addBreadcrumb({
-        message: "Urgent filter button clicked (experimental 50/50)",
-        category: "user",
-        data: {
-          urgentTasksCount,
-          randomValue,
-        },
-      });
-
-      Sentry.captureException(error);
-
-      console.error("[Urgent Filter Error]", error);
-
-      throw error;
+    Sentry.addBreadcrumb({
+      message: "Urgent filter triggered",
+      category: "user",
+      data: { urgentTasksCount, randomValue },
     });
-  }
+
+    Sentry.captureException(error);
+
+    console.error(error);
+
+    throw error;
+  });
 
   console.log("All listeners attached");
 }
 
 
-// ===============================
-// SAFE ENTRY POINT
-// ===============================
-if (typeof window !== "undefined") {
+// =========================
+// SAFE BOOTSTRAP
+// =========================
+if (isBrowser) {
   if (document.readyState === "loading") {
-    window.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", init);
   } else {
     init();
   }
 }
-
 
 // ===== ФУНКЦІЇ =====
 function greet(name) {
