@@ -1,80 +1,245 @@
-
 import * as Sentry from "@sentry/browser";
-import posthog from 'posthog-js';
+import posthog from "posthog-js";
 
-// Ініціалізація PostHog
-posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
-  api_host: import.meta.env.VITE_POSTHOG_HOST,
-  person_profiles: 'identified_only',
-});
+// ======================================================
+// POSTHOG
+// ======================================================
+posthog.init(
+  "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
+  {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    person_profiles: "identified_only",
+  }
+);
 
-// Ініціалізація Sentry 
+// ======================================================
+// SENTRY INIT
+// ======================================================
 Sentry.init({
   dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
+
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
   ],
+
+  // APM / Performance
   tracesSampleRate: 1.0,
+
+  // Session Replay
+  replaysSessionSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1.0,
+
   environment: "production",
+
+  // ВАЖЛИВО для session telemetry
+  release: "lab-1.0.0",
+
+  debug: true,
 });
 
-//  Налаштування контексту користувача =====
-// Викликається після успішної авторизації 
-function login() {
-  Sentry.setUser({
-    id: "12345",
-    email: "student@example.com",
-    segment: "premium_user"
-  });
-  console.log("User context set in Sentry");
-}
+// ======================================================
+// ЧЕКАЄМО ПОВНОГО ЗАВАНТАЖЕННЯ DOM
+// ======================================================
+window.addEventListener("DOMContentLoaded", () => {
 
+  console.log("DOM fully loaded");
 
-// При виході користувача очищаємо контекст
-function logout() {
-  Sentry.setUser(null);
-  console.log("User context cleared in Sentry");
-}
+  // ======================================================
+  // ОТРИМАННЯ ЕЛЕМЕНТІВ
+  // ======================================================
+  const loginBtn = document.getElementById("login-btn");
+  const logoutBtn = document.getElementById("logout-btn");
+  const urgentBtn = document.getElementById("urgent-btn");
+  const breakBtn = document.getElementById("break-btn");
+  const loadBtn = document.getElementById("load-btn");
 
-  // Прив’язуємо кнопки до функцій
-document.getElementById("login-btn").addEventListener("click", login);
-document.getElementById("logout-btn").addEventListener("click", logout);
+  console.log("loadBtn:", loadBtn);
+  console.log("loginBtn:", loginBtn);
+  console.log("logoutBtn:", logoutBtn);
+  console.log("urgentBtn:", urgentBtn);
+  console.log("breakBtn:", breakBtn);
 
+  // ======================================================
+  // LOGIN / LOGOUT
+  // ======================================================
+  function login() {
 
-// Feature Flag: Urgent Filter
-posthog.onFeatureFlags(() => {
-  const urgentBtn = document.getElementById('urgent-btn');
-  if (posthog.isFeatureEnabled('show-urgent-filter')) {
-    if (urgentBtn) urgentBtn.style.display = 'block';
-  } else {
-    if (urgentBtn) urgentBtn.style.display = 'none';
+    Sentry.setUser({
+      id: "12345",
+      email: "student@example.com",
+      segment: "premium_user",
+    });
+
+    console.log("User context set");
   }
-});
 
-// Обробник кнопки Break the world
-document.getElementById("break-btn").addEventListener("click", () => {
-  const urgentTasksCount = 5;
-  const randomValue = Math.random();
+  function logout() {
 
-  const errorMessage = `Critical failure in show-urgent-filter action: ${
-    urgentTasksCount > 2 ? `too many urgent tasks (${urgentTasksCount})` : "unknown issue"
-  }`;
+    Sentry.setUser(null);
 
-  const error = new Error(errorMessage);
+    console.log("User context cleared");
+  }
 
-  Sentry.addBreadcrumb({
-    message: 'Urgent filter button clicked (experimental 50/50)',
-    category: 'user',
-    data: { urgentTasksCount, randomValue },
+  // ======================================================
+  // FEATURE FLAGS
+  // ======================================================
+  posthog.onFeatureFlags(() => {
+
+    if (posthog.isFeatureEnabled("show-urgent-filter")) {
+
+      if (urgentBtn) {
+        urgentBtn.style.display = "block";
+      }
+
+    } else {
+
+      if (urgentBtn) {
+        urgentBtn.style.display = "none";
+      }
+    }
   });
 
-  Sentry.captureException(error);
-  console.error('[Urgent Filter Error]', error);
-  throw error;
+  // ======================================================
+  // ФЕЙКОВИЙ API ЗАПИТ
+  // ======================================================
+  async function fakeApiRequest() {
+
+    return Sentry.startSpan(
+      {
+        op: "http.client",
+        name: "GET /tasks",
+      },
+      async () => {
+
+        console.log("Fake API request started");
+
+        // Імітація повільного бекенду
+        await new Promise((resolve) =>
+          setTimeout(resolve, 3000)
+        );
+
+        console.log("Fake API request finished");
+
+        return {
+          tasks: [1, 2, 3],
+        };
+      }
+    );
+  }
+
+  // ======================================================
+  // ВАЖКИЙ UI РЕНДЕРИНГ
+  // ======================================================
+  async function heavyUiRender() {
+
+    return Sentry.startSpan(
+      {
+        op: "ui.render",
+        name: "Heavy Tasks Component",
+      },
+      async () => {
+
+        console.log("Heavy UI rendering started");
+
+        const start = Date.now();
+
+        // Навмисне CPU навантаження
+        while (Date.now() - start < 2000) {
+          Math.sqrt(Math.random() * 100000);
+        }
+
+        console.log("Heavy UI rendering finished");
+      }
+    );
+  }
+
+  // ======================================================
+  // LOAD TASKS BUTTON
+  // СТВОРЮЄ TRANSACTION
+  // ======================================================
+  if (loadBtn) {
+
+    loadBtn.addEventListener("click", async () => {
+
+      console.log("Load button clicked");
+
+      await Sentry.startSpan(
+        {
+          op: "navigation",
+          name: "Load Tasks Page",
+        },
+        async () => {
+
+          console.log("Transaction started");
+
+          // API request
+          await fakeApiRequest();
+
+          // UI rendering
+          await heavyUiRender();
+
+          console.log("Transaction finished");
+        }
+      );
+    });
+  }
+
+  // ======================================================
+  // LOGIN BUTTON
+  // ======================================================
+  if (loginBtn) {
+
+    loginBtn.addEventListener("click", login);
+  }
+
+  // ======================================================
+  // LOGOUT BUTTON
+  // ======================================================
+  if (logoutBtn) {
+
+    logoutBtn.addEventListener("click", logout);
+  }
+
+  // ======================================================
+  // BREAK BUTTON
+  // ======================================================
+  if (breakBtn) {
+
+    breakBtn.addEventListener("click", () => {
+
+      const urgentTasksCount = 5;
+      const randomValue = Math.random();
+
+      const errorMessage =
+        `Critical failure in show-urgent-filter action: ${
+          urgentTasksCount > 2
+            ? `too many urgent tasks (${urgentTasksCount})`
+            : "unknown issue"
+        }`;
+
+      const error = new Error(errorMessage);
+
+      Sentry.addBreadcrumb({
+        message:
+          "Urgent filter button clicked (experimental 50/50)",
+        category: "user",
+        data: {
+          urgentTasksCount,
+          randomValue,
+        },
+      });
+
+      Sentry.captureException(error);
+
+      console.error("[Urgent Filter Error]", error);
+
+      throw error;
+    });
+  }
+
+  console.log("All listeners attached");
 });
-
-
 
 
 

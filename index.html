@@ -1,76 +1,220 @@
 <!DOCTYPE html>
 <html lang="uk">
+
 <head>
   <meta charset="UTF-8">
   <title>Demo Program</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
   <div class="container">
+
     <h1>Інтерактивна програма</h1>
 
+    <!-- ====================================================== -->
+    <!-- ПРИВІТАННЯ -->
+    <!-- ====================================================== -->
     <section>
+
       <h2>Привітання</h2>
-      <input id="name-input" type="text" placeholder="Введіть ім'я">
-      <button id="greet-button">Привітати</button>
+
+      <input
+        id="name-input"
+        type="text"
+        placeholder="Введіть ім'я"
+      >
+
+      <button id="greet-button">
+        Привітати
+      </button>
+
       <p id="greet-result"></p>
+
     </section>
 
+    <!-- ====================================================== -->
+    <!-- МАТЕМАТИЧНІ ОПЕРАЦІЇ -->
+    <!-- ====================================================== -->
     <section>
+
       <h2>Математичні операції</h2>
-      <input id="num-a" type="number" placeholder="Перше число">
-      <input id="num-b" type="number" placeholder="Друге число">
-      <button id="math-button">Обчислити</button>
+
+      <input
+        id="num-a"
+        type="number"
+        placeholder="Перше число"
+      >
+
+      <input
+        id="num-b"
+        type="number"
+        placeholder="Друге число"
+      >
+
+      <button id="math-button">
+        Обчислити
+      </button>
+
       <pre id="math-result"></pre>
+
     </section>
 
+    <!-- ====================================================== -->
+    <!-- ПАЛІНДРОМ -->
+    <!-- ====================================================== -->
     <section>
+
       <h2>Перевірка паліндрома</h2>
-      <input id="pal-input" type="text" placeholder="Введіть текст">
-      <button id="pal-button">Перевірити</button>
+
+      <input
+        id="pal-input"
+        type="text"
+        placeholder="Введіть текст"
+      >
+
+      <button id="pal-button">
+        Перевірити
+      </button>
+
       <p id="pal-result"></p>
+
     </section>
 
+    <!-- ====================================================== -->
+    <!-- ФАКТОРІАЛ -->
+    <!-- ====================================================== -->
     <section>
+
       <h2>Факторіал</h2>
-      <input id="fact-input" type="number" placeholder="Введіть число">
-      <button id="fact-button">Обчислити</button>
+
+      <input
+        id="fact-input"
+        type="number"
+        placeholder="Введіть число"
+      >
+
+      <button id="fact-button">
+        Обчислити
+      </button>
+
       <p id="fact-result"></p>
+
     </section>
 
+    <!-- ====================================================== -->
+    <!-- TODO -->
+    <!-- ====================================================== -->
     <section>
+
       <h2>ToDo список</h2>
-      <input id="task-desc" type="text" placeholder="Опис завдання">
-      <button id="add-task">Додати</button>
+
+      <input
+        id="task-desc"
+        type="text"
+        placeholder="Опис завдання"
+      >
+
+      <button id="add-task">
+        Додати
+      </button>
+
       <br><br>
-      <input id="task-id" type="number" placeholder="ID завдання">
-      <button id="mark-done">Позначити виконаним</button>
-      <button id="remove-task">Видалити</button>
+
+      <input
+        id="task-id"
+        type="number"
+        placeholder="ID завдання"
+      >
+
+      <button id="mark-done">
+        Позначити виконаним
+      </button>
+
+      <button id="remove-task">
+        Видалити
+      </button>
 
       <div class="todo-row">
-        <button id="list-tasks">Показати всі</button>
-        <button id="urgent-btn" style="display:none;">Only Urgent</button>
+
+        <button id="list-tasks">
+          Показати всі
+        </button>
+
+        <button
+          id="urgent-btn"
+          style="display:none;"
+        >
+          Only Urgent
+        </button>
+
       </div>
 
       <br><br>
-      <button id="save-tasks">Зберегти</button>
-      <button id="load-tasks">Завантажити</button>
+
+      <button id="save-tasks">
+        Зберегти
+      </button>
+
+      <button id="load-tasks">
+        Завантажити
+      </button>
+
       <pre id="output"></pre>
+
     </section>
 
-    <!-- Нова кнопка для симуляції помилки -->
+    <!-- ====================================================== -->
+    <!-- SENTRY ERROR TEST -->
+    <!-- ====================================================== -->
     <section>
-      <h2>Тест Sentry</h2>
-      <button id="break-btn">Break the world</button>
-      <button id="login-btn">Login</button>
-      <button id="logout-btn">Logout</button>
 
+      <h2>Тест Sentry</h2>
+
+      <button id="break-btn">
+        Break the world
+      </button>
+
+      <button id="login-btn">
+        Login
+      </button>
+
+      <button id="logout-btn">
+        Logout
+      </button>
 
     </section>
 
+    <!-- ====================================================== -->
+    <!-- SENTRY APM / PERFORMANCE -->
+    <!-- ====================================================== -->
+    <section>
+
+      <h2>APM / Performance Test</h2>
+
+      <p>
+        Кнопка створює transaction та spans для Sentry Performance.
+      </p>
+
+      <button id="load-btn">
+        Simulate Transaction
+      </button>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- STATUS -->
+    <!-- ====================================================== -->
     <footer id="status"></footer>
+
   </div>
 
+  <!-- ====================================================== -->
+  <!-- MAIN JS -->
+  <!-- ====================================================== -->
   <script type="module" src="./main.js"></script>
+
 </body>
+
 </html>
