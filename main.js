@@ -35,7 +35,7 @@ Sentry.init({
   debug: true,
 });
 
-
+if (typeof window !== "undefined") {
 // ЧЕКАЄМО ПОВНОГО ЗАВАНТАЖЕННЯ DOM
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -224,7 +224,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("All listeners attached");
 });
-
+}
 
 
 // ===== ФУНКЦІЇ =====
