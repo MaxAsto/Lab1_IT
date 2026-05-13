@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-/* global window document */
+/* global window  */
 
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
