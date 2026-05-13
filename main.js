@@ -1,6 +1,7 @@
 
 import posthog from 'posthog-js'
 import { createApp } from 'vue'
+import router from "./router";
 
 // Ініціалізація PostHog
 posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
@@ -10,6 +11,18 @@ posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
 
 const app = createApp({
   template: `<div id="app"><h1>Hello Vue + PostHog!</h1></div>`
+})
+
+// Ініціалізація Sentry
+Sentry.init({
+  app,
+  dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",   
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+  tracesSampleRate: 1.0,        
+  environment: "development",   
 })
 
 app.mount('#app')
