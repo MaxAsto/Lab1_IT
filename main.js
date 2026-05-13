@@ -27,7 +27,7 @@ Sentry.init({
 })
 app.mount('#app')
 
-myUndefinedFunction();
+
 
 
 // ===== Feature Flag: Urgent Filter =====
