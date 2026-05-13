@@ -1,15 +1,16 @@
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
 
-// =========================
-// SAFE ENV CHECK
-// =========================
-const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
+// =====================
+// SAFE CHECK (ВАЖЛИВО)
+// =====================
+const isBrowser =
+  typeof window !== "undefined" &&
+  typeof document !== "undefined";
 
-
-// =========================
-// ANALYTICS INIT (browser only)
-// =========================
+// =====================
+// INIT ANALYTICS
+// =====================
 if (isBrowser) {
   posthog.init(
     "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
@@ -21,69 +22,41 @@ if (isBrowser) {
 
   Sentry.init({
     dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
-
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration(),
     ],
-
     tracesSampleRate: 1.0,
     replaysSessionSampleRate: 1.0,
     replaysOnErrorSampleRate: 1.0,
-
     environment: "production",
     release: "lab-1.0.0",
     debug: true,
   });
 }
 
-
-// =========================
+// =====================
 // APP LOGIC
-// =========================
+// =====================
 function init() {
-  if (!isBrowser) return;
-
-  console.log("App initialized");
-
   const loginBtn = document.getElementById("login-btn");
   const logoutBtn = document.getElementById("logout-btn");
   const urgentBtn = document.getElementById("urgent-btn");
   const breakBtn = document.getElementById("break-btn");
   const loadBtn = document.getElementById("load-btn");
 
-  // -------------------------
-  // AUTH
-  // -------------------------
   function login() {
     Sentry.setUser({
       id: "12345",
       email: "student@example.com",
       segment: "premium_user",
     });
-
-    console.log("User logged in");
   }
 
   function logout() {
     Sentry.setUser(null);
-    console.log("User logged out");
   }
 
-  // -------------------------
-  // FEATURE FLAGS (PostHog)
-  // -------------------------
-  posthog.onFeatureFlags(() => {
-    const enabled = posthog.isFeatureEnabled("show-urgent-filter");
-
-    if (urgentBtn) {
-      urgentBtn.style.display = enabled ? "block" : "none";
-    }
-  });
-
-  // -------------------------
-  // FAKE API
-  // -------------------------
   async function fakeApiRequest() {
     return Sentry.startSpan(
       {
@@ -91,20 +64,12 @@ function init() {
         name: "GET /tasks",
       },
       async () => {
-        console.log("API start");
-
         await new Promise((r) => setTimeout(r, 3000));
-
-        console.log("API done");
-
         return { tasks: [1, 2, 3] };
       }
     );
   }
 
-  // -------------------------
-  // HEAVY UI
-  // -------------------------
   async function heavyUiRender() {
     return Sentry.startSpan(
       {
@@ -112,22 +77,15 @@ function init() {
         name: "Heavy Tasks Component",
       },
       async () => {
-        console.log("UI start");
+        const start = Date.now();
 
-        const start = performance.now();
-
-        while (performance.now() - start < 2000) {
+        while (Date.now() - start < 2000) {
           Math.sqrt(Math.random() * 100000);
         }
-
-        console.log("UI done");
       }
     );
   }
 
-  // -------------------------
-  // LOAD FLOW
-  // -------------------------
   if (loadBtn) {
     loadBtn.addEventListener("click", async () => {
       await Sentry.startSpan(
@@ -143,47 +101,28 @@ function init() {
     });
   }
 
-  // -------------------------
-  // AUTH EVENTS
-  // -------------------------
   loginBtn?.addEventListener("click", login);
   logoutBtn?.addEventListener("click", logout);
 
-  // -------------------------
-  // ERROR TEST BUTTON
-  // -------------------------
-  breakBtn?.addEventListener("click", () => {
-    const urgentTasksCount = 5;
-    const randomValue = Math.random();
+  if (breakBtn) {
+    breakBtn.addEventListener("click", () => {
+      const error = new Error("Forced error for Sentry test");
 
-    const error = new Error(
-      `Critical failure: ${
-        urgentTasksCount > 2
-          ? `too many tasks (${urgentTasksCount})`
-          : "unknown issue"
-      }`
-    );
+      Sentry.addBreadcrumb({
+        message: "Break button clicked",
+        category: "user",
+      });
 
-    Sentry.addBreadcrumb({
-      message: "Urgent filter triggered",
-      category: "user",
-      data: { urgentTasksCount, randomValue },
+      Sentry.captureException(error);
+
+      throw error;
     });
-
-    Sentry.captureException(error);
-
-    console.error(error);
-
-    throw error;
-  });
-
-  console.log("All listeners attached");
+  }
 }
 
-
-// =========================
-// SAFE BOOTSTRAP
-// =========================
+// =====================
+// SAFE START (FIX ALL ERRORS)
+// =====================
 if (isBrowser) {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
