@@ -4,7 +4,7 @@ import prettier from "eslint-plugin-prettier";
 export default [
   js.configs.recommended,
   {
-    files: ["**/*.js", "**/*.vue"], // перевіряємо всі js та vue файли у проєкті
+    files: ["**/*.js", "**/*.vue"], 
     ignores: ["dist/**", "htmlcov/**"],
 
     languageOptions: {
@@ -20,7 +20,8 @@ export default [
         clearTimeout: "readonly",
         location: "readonly",
         Event: "readonly",
-        URL: "readonly" 
+        URL: "readonly",
+        console: "readonly" // додано, щоб ESLint не сварився
       },
     },
 
@@ -28,7 +29,7 @@ export default [
 
     rules: {
       "prettier/prettier": "error",
-      "no-console": "warn",
+      "no-console": "warn", // залишаємо як попередження, щоб не блокувало білд
       "no-unused-vars": "error",
       "no-empty": "error",
     },
