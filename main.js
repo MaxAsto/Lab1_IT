@@ -1,9 +1,8 @@
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
 
-// ======================================================
+
 // POSTHOG
-// ======================================================
 posthog.init(
   "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
   {
@@ -12,9 +11,7 @@ posthog.init(
   }
 );
 
-// ======================================================
 // SENTRY INIT
-// ======================================================
 Sentry.init({
   dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
 
@@ -32,22 +29,21 @@ Sentry.init({
 
   environment: "production",
 
-  // ВАЖЛИВО для session telemetry
+  
   release: "lab-1.0.0",
 
   debug: true,
 });
 
-// ======================================================
+
 // ЧЕКАЄМО ПОВНОГО ЗАВАНТАЖЕННЯ DOM
-// ======================================================
 window.addEventListener("DOMContentLoaded", () => {
 
   console.log("DOM fully loaded");
 
-  // ======================================================
+
   // ОТРИМАННЯ ЕЛЕМЕНТІВ
-  // ======================================================
+  
   const loginBtn = document.getElementById("login-btn");
   const logoutBtn = document.getElementById("logout-btn");
   const urgentBtn = document.getElementById("urgent-btn");
@@ -60,9 +56,7 @@ window.addEventListener("DOMContentLoaded", () => {
   console.log("urgentBtn:", urgentBtn);
   console.log("breakBtn:", breakBtn);
 
-  // ======================================================
   // LOGIN / LOGOUT
-  // ======================================================
   function login() {
 
     Sentry.setUser({
@@ -81,9 +75,8 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log("User context cleared");
   }
 
-  // ======================================================
+
   // FEATURE FLAGS
-  // ======================================================
   posthog.onFeatureFlags(() => {
 
     if (posthog.isFeatureEnabled("show-urgent-filter")) {
@@ -100,9 +93,8 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ======================================================
+
   // ФЕЙКОВИЙ API ЗАПИТ
-  // ======================================================
   async function fakeApiRequest() {
 
     return Sentry.startSpan(
@@ -128,9 +120,7 @@ window.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // ======================================================
   // ВАЖКИЙ UI РЕНДЕРИНГ
-  // ======================================================
   async function heavyUiRender() {
 
     return Sentry.startSpan(
@@ -154,10 +144,8 @@ window.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // ======================================================
   // LOAD TASKS BUTTON
   // СТВОРЮЄ TRANSACTION
-  // ======================================================
   if (loadBtn) {
 
     loadBtn.addEventListener("click", async () => {
@@ -185,25 +173,21 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ======================================================
   // LOGIN BUTTON
-  // ======================================================
   if (loginBtn) {
 
     loginBtn.addEventListener("click", login);
   }
 
-  // ======================================================
+
   // LOGOUT BUTTON
-  // ======================================================
   if (logoutBtn) {
 
     logoutBtn.addEventListener("click", logout);
   }
 
-  // ======================================================
+ 
   // BREAK BUTTON
-  // ======================================================
   if (breakBtn) {
 
     breakBtn.addEventListener("click", () => {
