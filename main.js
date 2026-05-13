@@ -19,6 +19,26 @@ Sentry.init({
   environment: "production",
 });
 
+//  Налаштування контексту користувача =====
+// Викликається після успішної авторизації 
+function login() {
+  Sentry.setUser({
+    id: "12345",
+    email: "student@example.com",
+    segment: "premium_user"
+  });
+  console.log("User context set in Sentry");
+}
+
+
+login();
+
+// При виході користувача очищаємо контекст
+function logout() {
+  Sentry.setUser(null);
+  console.log("User context cleared in Sentry");
+}
+
 // Feature Flag: Urgent Filter
 posthog.onFeatureFlags(() => {
   const urgentBtn = document.getElementById('urgent-btn');

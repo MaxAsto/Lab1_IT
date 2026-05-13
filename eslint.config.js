@@ -21,7 +21,7 @@ export default [
         location: "readonly",
         Event: "readonly",
         URL: "readonly",
-        console: "readonly" // додано, щоб ESLint не сварився
+        console: "readonly" 
       },
     },
 
