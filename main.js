@@ -1,47 +1,58 @@
 
-import posthog from 'posthog-js'
-import { createApp } from 'vue'
-import * as Sentry from "@sentry/vue";
-
+import * as Sentry from "@sentry/browser";
+import posthog from 'posthog-js';
 
 // Ініціалізація PostHog
 posthog.init('phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp', {
   api_host: import.meta.env.VITE_POSTHOG_HOST,
   person_profiles: 'identified_only',
-})
+});
 
-const app = createApp({
-  template: `<div id="app"><h1>Hello Vue + PostHog!</h1></div>`
-})
-
-// Ініціалізація Sentry
+// Ініціалізація Sentry 
 Sentry.init({
-  app,
-  dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",   
+  dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
   ],
-  tracesSampleRate: 1.0,        
-  environment: "production",   
-})
-app.mount('#app')
+  tracesSampleRate: 1.0,
+  environment: "production",
+});
 
-
-
-
-// ===== Feature Flag: Urgent Filter =====
+// Feature Flag: Urgent Filter
 posthog.onFeatureFlags(() => {
+  const urgentBtn = document.getElementById('urgent-btn');
   if (posthog.isFeatureEnabled('show-urgent-filter')) {
-    // Якщо прапорець увімкнений → показуємо кнопку
-    const urgentBtn = document.getElementById('urgent-btn');
     if (urgentBtn) urgentBtn.style.display = 'block';
   } else {
-    // Якщо прапорець вимкнений → ховаємо кнопку
-    const urgentBtn = document.getElementById('urgent-btn');
     if (urgentBtn) urgentBtn.style.display = 'none';
   }
 });
+
+// Обробник кнопки Break the world
+document.getElementById("break-btn").addEventListener("click", () => {
+  const urgentTasksCount = 5;
+  const randomValue = Math.random();
+
+  const errorMessage = `Critical failure in show-urgent-filter action: ${
+    urgentTasksCount > 2 ? `too many urgent tasks (${urgentTasksCount})` : "unknown issue"
+  }`;
+
+  const error = new Error(errorMessage);
+
+  Sentry.addBreadcrumb({
+    message: 'Urgent filter button clicked (experimental 50/50)',
+    category: 'user',
+    data: { urgentTasksCount, randomValue },
+  });
+
+  Sentry.captureException(error);
+  console.error('[Urgent Filter Error]', error);
+  throw error;
+});
+
+
+
 
 
 // ===== ФУНКЦІЇ =====
