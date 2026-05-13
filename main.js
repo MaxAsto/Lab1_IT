@@ -1,135 +1,233 @@
 import * as Sentry from "@sentry/browser";
 import posthog from "posthog-js";
 
-// =====================
-// SAFE CHECK (ВАЖЛИВО)
-// =====================
-const isBrowser =
-  typeof window !== "undefined" &&
-  typeof document !== "undefined";
 
-// =====================
-// INIT ANALYTICS
-// =====================
-if (isBrowser) {
-  posthog.init(
-    "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
-    {
-      api_host: import.meta.env.VITE_POSTHOG_HOST,
-      person_profiles: "identified_only",
-    }
-  );
+// POSTHOG
+posthog.init(
+  "phc_BqdMueTPNDFsxbJmEKWjH2pcJWQVs4kPm9zt8KSX7Fcp",
+  {
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    person_profiles: "identified_only",
+  }
+);
 
-  Sentry.init({
-    dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
-    integrations: [
-      Sentry.browserTracingIntegration(),
-      Sentry.replayIntegration(),
-    ],
-    tracesSampleRate: 1.0,
-    replaysSessionSampleRate: 1.0,
-    replaysOnErrorSampleRate: 1.0,
-    environment: "production",
-    release: "lab-1.0.0",
-    debug: true,
-  });
-}
+// SENTRY INIT
+Sentry.init({
+  dsn: "https://d08777a0bdcb42c78471ab489e6e54f5@o4511381581332480.ingest.de.sentry.io/4511381597388880",
 
-// =====================
-// APP LOGIC
-// =====================
-function init() {
+  integrations: [
+    Sentry.browserTracingIntegration(),
+    Sentry.replayIntegration(),
+  ],
+
+  // APM / Performance
+  tracesSampleRate: 1.0,
+
+  // Session Replay
+  replaysSessionSampleRate: 1.0,
+  replaysOnErrorSampleRate: 1.0,
+
+  environment: "production",
+
+  
+  release: "lab-1.0.0",
+
+  debug: true,
+});
+
+
+// ЧЕКАЄМО ПОВНОГО ЗАВАНТАЖЕННЯ DOM
+window.addEventListener("DOMContentLoaded", () => {
+
+  console.log("DOM fully loaded");
+
+
+  // ОТРИМАННЯ ЕЛЕМЕНТІВ
+  
   const loginBtn = document.getElementById("login-btn");
   const logoutBtn = document.getElementById("logout-btn");
   const urgentBtn = document.getElementById("urgent-btn");
   const breakBtn = document.getElementById("break-btn");
   const loadBtn = document.getElementById("load-btn");
 
+  console.log("loadBtn:", loadBtn);
+  console.log("loginBtn:", loginBtn);
+  console.log("logoutBtn:", logoutBtn);
+  console.log("urgentBtn:", urgentBtn);
+  console.log("breakBtn:", breakBtn);
+
+  // ======================================================
+  // LOGIN / LOGOUT
+
   function login() {
+
     Sentry.setUser({
       id: "12345",
       email: "student@example.com",
       segment: "premium_user",
     });
+
+    console.log("User context set");
   }
 
   function logout() {
+
     Sentry.setUser(null);
+
+    console.log("User context cleared");
   }
 
+
+  // FEATURE FLAGS
+  posthog.onFeatureFlags(() => {
+
+    if (posthog.isFeatureEnabled("show-urgent-filter")) {
+
+      if (urgentBtn) {
+        urgentBtn.style.display = "block";
+      }
+
+    } else {
+
+      if (urgentBtn) {
+        urgentBtn.style.display = "none";
+      }
+    }
+  });
+
+
+  // ФЕЙКОВИЙ API ЗАПИТ
   async function fakeApiRequest() {
+
     return Sentry.startSpan(
       {
         op: "http.client",
         name: "GET /tasks",
       },
       async () => {
-        await new Promise((r) => setTimeout(r, 3000));
-        return { tasks: [1, 2, 3] };
+
+        console.log("Fake API request started");
+
+        // Імітація повільного бекенду
+        await new Promise((resolve) =>
+          setTimeout(resolve, 3000)
+        );
+
+        console.log("Fake API request finished");
+
+        return {
+          tasks: [1, 2, 3],
+        };
       }
     );
   }
 
+  // ВАЖКИЙ UI РЕНДЕРИНГ
   async function heavyUiRender() {
+
     return Sentry.startSpan(
       {
         op: "ui.render",
         name: "Heavy Tasks Component",
       },
       async () => {
+
+        console.log("Heavy UI rendering started");
+
         const start = Date.now();
 
+        // Навмисне CPU навантаження
         while (Date.now() - start < 2000) {
           Math.sqrt(Math.random() * 100000);
         }
+
+        console.log("Heavy UI rendering finished");
       }
     );
   }
 
+  // LOAD TASKS BUTTON
+  // СТВОРЮЄ TRANSACTION
   if (loadBtn) {
+
     loadBtn.addEventListener("click", async () => {
+
+      console.log("Load button clicked");
+
       await Sentry.startSpan(
         {
           op: "navigation",
           name: "Load Tasks Page",
         },
         async () => {
+
+          console.log("Transaction started");
+
+          // API request
           await fakeApiRequest();
+
+          // UI rendering
           await heavyUiRender();
+
+          console.log("Transaction finished");
         }
       );
     });
   }
 
-  loginBtn?.addEventListener("click", login);
-  logoutBtn?.addEventListener("click", logout);
+  // LOGIN BUTTON
+  if (loginBtn) {
 
+    loginBtn.addEventListener("click", login);
+  }
+
+
+  // LOGOUT BUTTON
+  if (logoutBtn) {
+
+    logoutBtn.addEventListener("click", logout);
+  }
+
+ 
+  // BREAK BUTTON
   if (breakBtn) {
+
     breakBtn.addEventListener("click", () => {
-      const error = new Error("Forced error for Sentry test");
+
+      const urgentTasksCount = 5;
+      const randomValue = Math.random();
+
+      const errorMessage =
+        `Critical failure in show-urgent-filter action: ${
+          urgentTasksCount > 2
+            ? `too many urgent tasks (${urgentTasksCount})`
+            : "unknown issue"
+        }`;
+
+      const error = new Error(errorMessage);
 
       Sentry.addBreadcrumb({
-        message: "Break button clicked",
+        message:
+          "Urgent filter button clicked (experimental 50/50)",
         category: "user",
+        data: {
+          urgentTasksCount,
+          randomValue,
+        },
       });
 
       Sentry.captureException(error);
 
+      console.error("[Urgent Filter Error]", error);
+
       throw error;
     });
   }
-}
 
-// =====================
-// SAFE START (FIX ALL ERRORS)
-// =====================
-if (isBrowser) {
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-}
+  console.log("All listeners attached");
+});
+
+
 
 // ===== ФУНКЦІЇ =====
 function greet(name) {
