@@ -39,6 +39,9 @@ function logout() {
   console.log("User context cleared in Sentry");
 }
 
+logout();
+
+
 // Feature Flag: Urgent Filter
 posthog.onFeatureFlags(() => {
   const urgentBtn = document.getElementById('urgent-btn');
